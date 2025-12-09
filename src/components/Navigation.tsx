@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -68,8 +68,25 @@ const LogoutButton = styled.button`
   }
 `;
 
+const LoginButton = styled.button`
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #2980b9;
+  }
+`;
+
 export default function Navigation() {
   const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <Nav>
@@ -78,12 +95,16 @@ export default function Navigation() {
           <StyledNavLink to="/">내 잔고</StyledNavLink>
           <StyledNavLink to="/nasdaq">NASDAQ TOP 100</StyledNavLink>
         </NavList>
-        {isAuthenticated && (
-          <UserSection>
-            <Username>Welcome, {user?.username}!</Username>
-            <LogoutButton onClick={logout}>Logout</LogoutButton>
-          </UserSection>
-        )}
+        <UserSection>
+          {isAuthenticated ? (
+            <>
+              <Username>Welcome, {user?.username}!</Username>
+              <LogoutButton onClick={logout}>Logout</LogoutButton>
+            </>
+          ) : (
+            <LoginButton onClick={() => navigate('/login')}>로그인하기</LoginButton>
+          )}
+        </UserSection>
       </NavContainer>
     </Nav>
   );
