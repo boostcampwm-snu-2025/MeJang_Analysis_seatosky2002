@@ -6,7 +6,6 @@ import Portfolio from './pages/Portfolio';
 import NasdaqTop100 from './pages/NasdaqTop100';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
   return (
@@ -17,22 +16,8 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route element={<MainLayout />}>
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Portfolio />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/nasdaq"
-              element={
-                <ProtectedRoute>
-                  <NasdaqTop100 />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/" element={<Portfolio />} />
+            <Route path="/nasdaq" element={<NasdaqTop100 />} />
           </Route>
         </Routes>
       </AuthProvider>
