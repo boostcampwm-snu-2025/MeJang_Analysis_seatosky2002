@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { Stock, NewsItem } from '../types/stock';
+import TradingViewWidget from '../components/TradingViewWidget';
 
 const PageContainer = styled.div`
   display: flex;
@@ -63,7 +64,6 @@ const StockHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
 `;
 
 const StockSymbol = styled.div`
@@ -112,23 +112,17 @@ const Change = styled.div<{ $isPositive: boolean }>`
   font-weight: 500;
 `;
 
-const MiniChart = styled.div`
-  height: 60px;
-  margin-top: 1rem;
-  background: linear-gradient(to right, transparent, rgba(59, 130, 246, 0.1));
-  border-radius: 4px;
-  position: relative;
-  overflow: hidden;
+const ChartContainer = styled.div`
+  flex: 1;
+  padding: 2rem;
+  background-color: #0f1428;
+`;
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(to right, #3b82f6, #22c55e);
-  }
+const ChartTitle = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1rem;
 `;
 
 const NewsContainer = styled.div`
@@ -205,12 +199,18 @@ const EmptyState = styled.div`
   text-align: center;
 `;
 
+// Mock 주식 데이터
 const mockStocks: Stock[] = [
-  { symbol: 'NVDA', name: 'NVIDIA Corporation', price: 495.82, change: 12.48, changePercent: 2.58 },
-  { symbol: 'MSFT', name: 'Microsoft Corporation', price: 378.91, change: -3.21, changePercent: -0.84 },
+  { symbol: 'AAPL', name: 'Apple Inc.', price: 277.18, change: -0.71, changePercent: -0.26 },
+  { symbol: 'MSFT', name: 'Microsoft Corporation', price: 492.02, change: 1.00, changePercent: 0.20 },
   { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 141.80, change: 5.82, changePercent: 4.16 },
-  { symbol: 'AAPL', name: 'Apple Inc.', price: 189.95, change: -2.15, changePercent: -1.12 },
+  { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 227.92, change: 1.03, changePercent: 0.45 },
+  { symbol: 'NVDA', name: 'NVIDIA Corporation', price: 184.97, change: -0.58, changePercent: -0.31 },
   { symbol: 'META', name: 'Meta Platforms Inc.', price: 338.54, change: 9.02, changePercent: 2.71 },
+  { symbol: 'TSLA', name: 'Tesla Inc.', price: 385.45, change: -5.20, changePercent: -1.33 },
+  { symbol: 'AVGO', name: 'Broadcom Inc.', price: 228.50, change: 3.15, changePercent: 1.40 },
+  { symbol: 'COST', name: 'Costco Wholesale Corporation', price: 1028.75, change: 12.50, changePercent: 1.23 },
+  { symbol: 'NFLX', name: 'Netflix Inc.', price: 858.92, change: -8.45, changePercent: -0.97 },
 ];
 
 const mockNews: Record<string, NewsItem[]> = {
@@ -243,7 +243,7 @@ export default function NasdaqTop100() {
       <LeftPanel>
         <Header>
           <Title>NASDAQ Stocks</Title>
-          <Subtitle>Real-time market data</Subtitle>
+          <Subtitle>Top 10 NASDAQ stocks</Subtitle>
         </Header>
         <StockList>
           {mockStocks.map((stock) => (
@@ -265,7 +265,6 @@ export default function NasdaqTop100() {
                   </Change>
                 </StockPrice>
               </StockHeader>
-              <MiniChart />
             </StockCard>
           ))}
         </StockList>
@@ -273,37 +272,53 @@ export default function NasdaqTop100() {
 
       <RightPanel>
         <Header>
-          <Title>Live News Stream</Title>
-          <Subtitle>Market updates & insights</Subtitle>
+          <Title>Stock Chart & News</Title>
+          <Subtitle>
+            {selectedStock
+              ? `${selectedStock} - ${mockStocks.find(s => s.symbol === selectedStock)?.name}`
+              : 'Select a stock to view details'}
+          </Subtitle>
         </Header>
-        <NewsContainer>
-          {selectedStock ? (
-            <>
+        {selectedStock ? (
+          <>
+            <ChartContainer>
+              <ChartTitle>Price Chart</ChartTitle>
+              <div style={{ height: '400px', width: '100%' }}>
+                <TradingViewWidget symbol={selectedStock} theme="dark" />
+              </div>
+            </ChartContainer>
+            <NewsContainer>
               <NewsHeader>
-                <NewsTitle>{selectedStock} News</NewsTitle>
-                <NewsSubtitle>Latest updates for {mockStocks.find(s => s.symbol === selectedStock)?.name}</NewsSubtitle>
+                <NewsTitle>Latest News</NewsTitle>
+                <NewsSubtitle>Market updates & insights</NewsSubtitle>
               </NewsHeader>
-              {currentNews.map((news) => (
-                <NewsCard key={news.id}>
-                  <NewsCardHeader>
-                    <NewsItemTitle>{news.title}</NewsItemTitle>
-                    <SentimentBadge $sentiment={news.sentiment}>
-                      {news.sentiment === 'bullish' ? 'Bullish' : news.sentiment === 'bearish' ? 'Bearish' : 'Neutral'}
-                    </SentimentBadge>
-                  </NewsCardHeader>
-                  <NewsMetadata>
-                    <span>⏱ {news.timestamp}</span>
-                    <span>{news.source}</span>
-                  </NewsMetadata>
-                </NewsCard>
-              ))}
-            </>
-          ) : (
-            <EmptyState>
-              <p>주식을 선택하면 관련 뉴스가 표시됩니다</p>
-            </EmptyState>
-          )}
-        </NewsContainer>
+              {currentNews.length > 0 ? (
+                currentNews.map((news) => (
+                  <NewsCard key={news.id}>
+                    <NewsCardHeader>
+                      <NewsItemTitle>{news.title}</NewsItemTitle>
+                      <SentimentBadge $sentiment={news.sentiment}>
+                        {news.sentiment === 'bullish' ? 'Bullish' : news.sentiment === 'bearish' ? 'Bearish' : 'Neutral'}
+                      </SentimentBadge>
+                    </NewsCardHeader>
+                    <NewsMetadata>
+                      <span>⏱ {news.timestamp}</span>
+                      <span>{news.source}</span>
+                    </NewsMetadata>
+                  </NewsCard>
+                ))
+              ) : (
+                <EmptyState>
+                  <p>No news available for {selectedStock}</p>
+                </EmptyState>
+              )}
+            </NewsContainer>
+          </>
+        ) : (
+          <EmptyState>
+            <p>주식을 선택하면 차트와 뉴스가 표시됩니다</p>
+          </EmptyState>
+        )}
       </RightPanel>
     </PageContainer>
   );
