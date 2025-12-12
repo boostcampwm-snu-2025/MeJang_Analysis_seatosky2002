@@ -145,12 +145,22 @@ const NewsSubtitle = styled.p`
   font-size: 0.875rem;
 `;
 
-const NewsCard = styled.div`
+const NewsCard = styled.a`
+  display: block;
   background-color: #141b3a;
   border: 1px solid #1e2749;
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #1e2749;
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+  }
 `;
 
 const NewsCardHeader = styled.div`
@@ -214,22 +224,55 @@ const mockStocks: Stock[] = [
 ];
 
 const mockNews: Record<string, NewsItem[]> = {
-  NVDA: [
-    { id: '1', title: 'NVIDIA Announces Next-Gen AI Chip Architecture', source: 'Reuters', timestamp: '2 minutes ago', sentiment: 'bullish' },
-    { id: '2', title: 'Fed Signals Potential Rate Cuts in Q1 2025', source: 'Bloomberg', timestamp: '15 minutes ago', sentiment: 'bullish' },
-    { id: '3', title: 'Tech Stocks Face Headwinds from Regulatory Concerns', source: 'WSJ', timestamp: '32 minutes ago', sentiment: 'bearish' },
+  AAPL: [
+    { id: 'aapl1', title: 'Apple Unveils New Vision Pro Features at WWDC 2025', source: 'TechCrunch', timestamp: '1 hour ago', sentiment: 'bullish', link: 'https://techcrunch.com/apple-vision-pro-updates' },
+    { id: 'aapl2', title: 'iPhone Sales Surge in Asian Markets', source: 'Bloomberg', timestamp: '3 hours ago', sentiment: 'bullish', link: 'https://www.bloomberg.com/news/iphone-sales-asia' },
+    { id: 'aapl3', title: 'Supply Chain Issues May Impact Q2 Production', source: 'WSJ', timestamp: '5 hours ago', sentiment: 'bearish', link: 'https://www.wsj.com/articles/apple-supply-chain' },
   ],
   MSFT: [
-    { id: '4', title: 'Microsoft Cloud Revenue Beats Expectations', source: 'CNBC', timestamp: '1 hour ago', sentiment: 'bullish' },
+    { id: 'msft1', title: 'Microsoft Azure Growth Exceeds Market Expectations', source: 'CNBC', timestamp: '30 minutes ago', sentiment: 'bullish', link: 'https://www.cnbc.com/microsoft-azure-growth' },
+    { id: 'msft2', title: 'New AI Copilot Features Drive Enterprise Adoption', source: 'The Verge', timestamp: '2 hours ago', sentiment: 'bullish', link: 'https://www.theverge.com/microsoft-copilot' },
+    { id: 'msft3', title: 'Microsoft Announces $10B Cloud Infrastructure Investment', source: 'Reuters', timestamp: '4 hours ago', sentiment: 'bullish', link: 'https://www.reuters.com/technology/microsoft-cloud' },
   ],
   GOOGL: [
-    { id: '5', title: 'Google AI Breakthrough in Quantum Computing', source: 'TechCrunch', timestamp: '45 minutes ago', sentiment: 'bullish' },
+    { id: 'googl1', title: 'Google Gemini AI Surpasses GPT-4 in Benchmarks', source: 'TechCrunch', timestamp: '45 minutes ago', sentiment: 'bullish', link: 'https://techcrunch.com/google-gemini-ai' },
+    { id: 'googl2', title: 'Antitrust Investigation Expands to Search Business', source: 'Financial Times', timestamp: '2 hours ago', sentiment: 'bearish', link: 'https://www.ft.com/content/google-antitrust' },
+    { id: 'googl3', title: 'YouTube Premium Subscribers Hit 100 Million Milestone', source: 'The Verge', timestamp: '6 hours ago', sentiment: 'bullish', link: 'https://www.theverge.com/youtube-premium' },
   ],
-  AAPL: [
-    { id: '6', title: 'Apple Faces Supply Chain Challenges', source: 'Financial Times', timestamp: '2 hours ago', sentiment: 'bearish' },
+  AMZN: [
+    { id: 'amzn1', title: 'Amazon Prime Day Breaks Sales Records', source: 'CNBC', timestamp: '1 hour ago', sentiment: 'bullish', link: 'https://www.cnbc.com/amazon-prime-day' },
+    { id: 'amzn2', title: 'AWS Launches New Quantum Computing Service', source: 'Reuters', timestamp: '3 hours ago', sentiment: 'bullish', link: 'https://www.reuters.com/technology/aws-quantum' },
+    { id: 'amzn3', title: 'Labor Unions Gain Ground in US Warehouses', source: 'Bloomberg', timestamp: '5 hours ago', sentiment: 'bearish', link: 'https://www.bloomberg.com/news/amazon-unions' },
+  ],
+  NVDA: [
+    { id: 'nvda1', title: 'NVIDIA Announces Next-Gen Blackwell AI Chips', source: 'Reuters', timestamp: '2 minutes ago', sentiment: 'bullish', link: 'https://www.reuters.com/technology/nvidia-blackwell' },
+    { id: 'nvda2', title: 'Gaming GPU Sales Show Strong Recovery', source: 'Tom\'s Hardware', timestamp: '1 hour ago', sentiment: 'bullish', link: 'https://www.tomshardware.com/nvidia-gaming-gpu' },
+    { id: 'nvda3', title: 'Data Center Revenue Reaches All-Time High', source: 'Bloomberg', timestamp: '4 hours ago', sentiment: 'bullish', link: 'https://www.bloomberg.com/news/nvidia-datacenter' },
   ],
   META: [
-    { id: '7', title: 'Meta Expands VR Product Line', source: 'The Verge', timestamp: '30 minutes ago', sentiment: 'bullish' },
+    { id: 'meta1', title: 'Meta Quest 4 Headset Leaks Show Major Improvements', source: 'The Verge', timestamp: '30 minutes ago', sentiment: 'bullish', link: 'https://www.theverge.com/meta-quest-4' },
+    { id: 'meta2', title: 'Instagram Launches New AI-Powered Shopping Features', source: 'TechCrunch', timestamp: '2 hours ago', sentiment: 'bullish', link: 'https://techcrunch.com/instagram-ai-shopping' },
+    { id: 'meta3', title: 'EU Fines Meta €1.2B for Privacy Violations', source: 'BBC News', timestamp: '5 hours ago', sentiment: 'bearish', link: 'https://www.bbc.com/news/meta-eu-fine' },
+  ],
+  TSLA: [
+    { id: 'tsla1', title: 'Tesla Cybertruck Production Ramps Up Ahead of Schedule', source: 'Electrek', timestamp: '1 hour ago', sentiment: 'bullish', link: 'https://electrek.co/tesla-cybertruck' },
+    { id: 'tsla2', title: 'New Gigafactory in Mexico Receives Government Approval', source: 'Reuters', timestamp: '3 hours ago', sentiment: 'bullish', link: 'https://www.reuters.com/business/tesla-mexico' },
+    { id: 'tsla3', title: 'Autopilot Safety Concerns Lead to NHTSA Investigation', source: 'CNBC', timestamp: '6 hours ago', sentiment: 'bearish', link: 'https://www.cnbc.com/tesla-autopilot-investigation' },
+  ],
+  AVGO: [
+    { id: 'avgo1', title: 'Broadcom Secures Major AI Chip Contract with Google', source: 'Bloomberg', timestamp: '2 hours ago', sentiment: 'bullish', link: 'https://www.bloomberg.com/news/broadcom-google' },
+    { id: 'avgo2', title: 'Q4 Earnings Beat Analyst Expectations', source: 'Reuters', timestamp: '4 hours ago', sentiment: 'bullish', link: 'https://www.reuters.com/technology/broadcom-earnings' },
+    { id: 'avgo3', title: 'Expansion into Custom AI Silicon Accelerators', source: 'AnandTech', timestamp: '7 hours ago', sentiment: 'bullish', link: 'https://www.anandtech.com/broadcom-ai-silicon' },
+  ],
+  COST: [
+    { id: 'cost1', title: 'Costco Membership Renewals Hit Record High', source: 'CNBC', timestamp: '1 hour ago', sentiment: 'bullish', link: 'https://www.cnbc.com/costco-memberships' },
+    { id: 'cost2', title: 'Same-Store Sales Growth Exceeds 8% in December', source: 'Bloomberg', timestamp: '3 hours ago', sentiment: 'bullish', link: 'https://www.bloomberg.com/news/costco-sales' },
+    { id: 'cost3', title: 'Plans to Open 30 New Warehouses in 2025', source: 'Reuters', timestamp: '5 hours ago', sentiment: 'bullish', link: 'https://www.reuters.com/business/costco-expansion' },
+  ],
+  NFLX: [
+    { id: 'nflx1', title: 'Netflix Password Sharing Crackdown Boosts Subscribers', source: 'The Verge', timestamp: '2 hours ago', sentiment: 'bullish', link: 'https://www.theverge.com/netflix-password-sharing' },
+    { id: 'nflx2', title: 'Original Content Spending to Increase 15% in 2025', source: 'Variety', timestamp: '4 hours ago', sentiment: 'bullish', link: 'https://variety.com/netflix-content-spending' },
+    { id: 'nflx3', title: 'Competition from Disney+ Intensifies', source: 'WSJ', timestamp: '6 hours ago', sentiment: 'bearish', link: 'https://www.wsj.com/articles/netflix-disney-competition' },
   ],
 };
 
@@ -294,7 +337,12 @@ export default function NasdaqTop100() {
               </NewsHeader>
               {currentNews.length > 0 ? (
                 currentNews.map((news) => (
-                  <NewsCard key={news.id}>
+                  <NewsCard
+                    key={news.id}
+                    href={news.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <NewsCardHeader>
                       <NewsItemTitle>{news.title}</NewsItemTitle>
                       <SentimentBadge $sentiment={news.sentiment}>
@@ -303,7 +351,7 @@ export default function NasdaqTop100() {
                     </NewsCardHeader>
                     <NewsMetadata>
                       <span>⏱ {news.timestamp}</span>
-                      <span>{news.source}</span>
+                      <span>📰 {news.source}</span>
                     </NewsMetadata>
                   </NewsCard>
                 ))
