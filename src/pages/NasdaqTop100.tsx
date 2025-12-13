@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { Stock, NewsItem } from '../types/stock';
+import TradingViewWidget from '../components/TradingViewWidget';
 
 const PageContainer = styled.div`
   display: flex;
@@ -63,7 +64,6 @@ const StockHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
 `;
 
 const StockSymbol = styled.div`
@@ -112,23 +112,17 @@ const Change = styled.div<{ $isPositive: boolean }>`
   font-weight: 500;
 `;
 
-const MiniChart = styled.div`
-  height: 60px;
-  margin-top: 1rem;
-  background: linear-gradient(to right, transparent, rgba(59, 130, 246, 0.1));
-  border-radius: 4px;
-  position: relative;
-  overflow: hidden;
+const ChartContainer = styled.div`
+  flex: 1;
+  padding: 2rem;
+  background-color: #0f1428;
+`;
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(to right, #3b82f6, #22c55e);
-  }
+const ChartTitle = styled.h2`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1rem;
 `;
 
 const NewsContainer = styled.div`
@@ -151,12 +145,22 @@ const NewsSubtitle = styled.p`
   font-size: 0.875rem;
 `;
 
-const NewsCard = styled.div`
+const NewsCard = styled.a`
+  display: block;
   background-color: #141b3a;
   border: 1px solid #1e2749;
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #1e2749;
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+  }
 `;
 
 const NewsCardHeader = styled.div`
@@ -205,31 +209,70 @@ const EmptyState = styled.div`
   text-align: center;
 `;
 
+// Mock 주식 데이터
 const mockStocks: Stock[] = [
-  { symbol: 'NVDA', name: 'NVIDIA Corporation', price: 495.82, change: 12.48, changePercent: 2.58 },
-  { symbol: 'MSFT', name: 'Microsoft Corporation', price: 378.91, change: -3.21, changePercent: -0.84 },
+  { symbol: 'AAPL', name: 'Apple Inc.', price: 277.18, change: -0.71, changePercent: -0.26 },
+  { symbol: 'MSFT', name: 'Microsoft Corporation', price: 492.02, change: 1.00, changePercent: 0.20 },
   { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 141.80, change: 5.82, changePercent: 4.16 },
-  { symbol: 'AAPL', name: 'Apple Inc.', price: 189.95, change: -2.15, changePercent: -1.12 },
+  { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 227.92, change: 1.03, changePercent: 0.45 },
+  { symbol: 'NVDA', name: 'NVIDIA Corporation', price: 184.97, change: -0.58, changePercent: -0.31 },
   { symbol: 'META', name: 'Meta Platforms Inc.', price: 338.54, change: 9.02, changePercent: 2.71 },
+  { symbol: 'TSLA', name: 'Tesla Inc.', price: 385.45, change: -5.20, changePercent: -1.33 },
+  { symbol: 'AVGO', name: 'Broadcom Inc.', price: 228.50, change: 3.15, changePercent: 1.40 },
+  { symbol: 'COST', name: 'Costco Wholesale Corporation', price: 1028.75, change: 12.50, changePercent: 1.23 },
+  { symbol: 'NFLX', name: 'Netflix Inc.', price: 858.92, change: -8.45, changePercent: -0.97 },
 ];
 
 const mockNews: Record<string, NewsItem[]> = {
-  NVDA: [
-    { id: '1', title: 'NVIDIA Announces Next-Gen AI Chip Architecture', source: 'Reuters', timestamp: '2 minutes ago', sentiment: 'bullish' },
-    { id: '2', title: 'Fed Signals Potential Rate Cuts in Q1 2025', source: 'Bloomberg', timestamp: '15 minutes ago', sentiment: 'bullish' },
-    { id: '3', title: 'Tech Stocks Face Headwinds from Regulatory Concerns', source: 'WSJ', timestamp: '32 minutes ago', sentiment: 'bearish' },
+  AAPL: [
+    { id: 'aapl1', title: 'Apple Unveils New Vision Pro Features at WWDC 2025', source: 'TechCrunch', timestamp: '1 hour ago', sentiment: 'bullish', link: 'https://techcrunch.com/apple-vision-pro-updates' },
+    { id: 'aapl2', title: 'iPhone Sales Surge in Asian Markets', source: 'Bloomberg', timestamp: '3 hours ago', sentiment: 'bullish', link: 'https://www.bloomberg.com/news/iphone-sales-asia' },
+    { id: 'aapl3', title: 'Supply Chain Issues May Impact Q2 Production', source: 'WSJ', timestamp: '5 hours ago', sentiment: 'bearish', link: 'https://www.wsj.com/articles/apple-supply-chain' },
   ],
   MSFT: [
-    { id: '4', title: 'Microsoft Cloud Revenue Beats Expectations', source: 'CNBC', timestamp: '1 hour ago', sentiment: 'bullish' },
+    { id: 'msft1', title: 'Microsoft Azure Growth Exceeds Market Expectations', source: 'CNBC', timestamp: '30 minutes ago', sentiment: 'bullish', link: 'https://www.cnbc.com/microsoft-azure-growth' },
+    { id: 'msft2', title: 'New AI Copilot Features Drive Enterprise Adoption', source: 'The Verge', timestamp: '2 hours ago', sentiment: 'bullish', link: 'https://www.theverge.com/microsoft-copilot' },
+    { id: 'msft3', title: 'Microsoft Announces $10B Cloud Infrastructure Investment', source: 'Reuters', timestamp: '4 hours ago', sentiment: 'bullish', link: 'https://www.reuters.com/technology/microsoft-cloud' },
   ],
   GOOGL: [
-    { id: '5', title: 'Google AI Breakthrough in Quantum Computing', source: 'TechCrunch', timestamp: '45 minutes ago', sentiment: 'bullish' },
+    { id: 'googl1', title: 'Google Gemini AI Surpasses GPT-4 in Benchmarks', source: 'TechCrunch', timestamp: '45 minutes ago', sentiment: 'bullish', link: 'https://techcrunch.com/google-gemini-ai' },
+    { id: 'googl2', title: 'Antitrust Investigation Expands to Search Business', source: 'Financial Times', timestamp: '2 hours ago', sentiment: 'bearish', link: 'https://www.ft.com/content/google-antitrust' },
+    { id: 'googl3', title: 'YouTube Premium Subscribers Hit 100 Million Milestone', source: 'The Verge', timestamp: '6 hours ago', sentiment: 'bullish', link: 'https://www.theverge.com/youtube-premium' },
   ],
-  AAPL: [
-    { id: '6', title: 'Apple Faces Supply Chain Challenges', source: 'Financial Times', timestamp: '2 hours ago', sentiment: 'bearish' },
+  AMZN: [
+    { id: 'amzn1', title: 'Amazon Prime Day Breaks Sales Records', source: 'CNBC', timestamp: '1 hour ago', sentiment: 'bullish', link: 'https://www.cnbc.com/amazon-prime-day' },
+    { id: 'amzn2', title: 'AWS Launches New Quantum Computing Service', source: 'Reuters', timestamp: '3 hours ago', sentiment: 'bullish', link: 'https://www.reuters.com/technology/aws-quantum' },
+    { id: 'amzn3', title: 'Labor Unions Gain Ground in US Warehouses', source: 'Bloomberg', timestamp: '5 hours ago', sentiment: 'bearish', link: 'https://www.bloomberg.com/news/amazon-unions' },
+  ],
+  NVDA: [
+    { id: 'nvda1', title: 'NVIDIA Announces Next-Gen Blackwell AI Chips', source: 'Reuters', timestamp: '2 minutes ago', sentiment: 'bullish', link: 'https://www.reuters.com/technology/nvidia-blackwell' },
+    { id: 'nvda2', title: 'Gaming GPU Sales Show Strong Recovery', source: 'Tom\'s Hardware', timestamp: '1 hour ago', sentiment: 'bullish', link: 'https://www.tomshardware.com/nvidia-gaming-gpu' },
+    { id: 'nvda3', title: 'Data Center Revenue Reaches All-Time High', source: 'Bloomberg', timestamp: '4 hours ago', sentiment: 'bullish', link: 'https://www.bloomberg.com/news/nvidia-datacenter' },
   ],
   META: [
-    { id: '7', title: 'Meta Expands VR Product Line', source: 'The Verge', timestamp: '30 minutes ago', sentiment: 'bullish' },
+    { id: 'meta1', title: 'Meta Quest 4 Headset Leaks Show Major Improvements', source: 'The Verge', timestamp: '30 minutes ago', sentiment: 'bullish', link: 'https://www.theverge.com/meta-quest-4' },
+    { id: 'meta2', title: 'Instagram Launches New AI-Powered Shopping Features', source: 'TechCrunch', timestamp: '2 hours ago', sentiment: 'bullish', link: 'https://techcrunch.com/instagram-ai-shopping' },
+    { id: 'meta3', title: 'EU Fines Meta €1.2B for Privacy Violations', source: 'BBC News', timestamp: '5 hours ago', sentiment: 'bearish', link: 'https://www.bbc.com/news/meta-eu-fine' },
+  ],
+  TSLA: [
+    { id: 'tsla1', title: 'Tesla Cybertruck Production Ramps Up Ahead of Schedule', source: 'Electrek', timestamp: '1 hour ago', sentiment: 'bullish', link: 'https://electrek.co/tesla-cybertruck' },
+    { id: 'tsla2', title: 'New Gigafactory in Mexico Receives Government Approval', source: 'Reuters', timestamp: '3 hours ago', sentiment: 'bullish', link: 'https://www.reuters.com/business/tesla-mexico' },
+    { id: 'tsla3', title: 'Autopilot Safety Concerns Lead to NHTSA Investigation', source: 'CNBC', timestamp: '6 hours ago', sentiment: 'bearish', link: 'https://www.cnbc.com/tesla-autopilot-investigation' },
+  ],
+  AVGO: [
+    { id: 'avgo1', title: 'Broadcom Secures Major AI Chip Contract with Google', source: 'Bloomberg', timestamp: '2 hours ago', sentiment: 'bullish', link: 'https://www.bloomberg.com/news/broadcom-google' },
+    { id: 'avgo2', title: 'Q4 Earnings Beat Analyst Expectations', source: 'Reuters', timestamp: '4 hours ago', sentiment: 'bullish', link: 'https://www.reuters.com/technology/broadcom-earnings' },
+    { id: 'avgo3', title: 'Expansion into Custom AI Silicon Accelerators', source: 'AnandTech', timestamp: '7 hours ago', sentiment: 'bullish', link: 'https://www.anandtech.com/broadcom-ai-silicon' },
+  ],
+  COST: [
+    { id: 'cost1', title: 'Costco Membership Renewals Hit Record High', source: 'CNBC', timestamp: '1 hour ago', sentiment: 'bullish', link: 'https://www.cnbc.com/costco-memberships' },
+    { id: 'cost2', title: 'Same-Store Sales Growth Exceeds 8% in December', source: 'Bloomberg', timestamp: '3 hours ago', sentiment: 'bullish', link: 'https://www.bloomberg.com/news/costco-sales' },
+    { id: 'cost3', title: 'Plans to Open 30 New Warehouses in 2025', source: 'Reuters', timestamp: '5 hours ago', sentiment: 'bullish', link: 'https://www.reuters.com/business/costco-expansion' },
+  ],
+  NFLX: [
+    { id: 'nflx1', title: 'Netflix Password Sharing Crackdown Boosts Subscribers', source: 'The Verge', timestamp: '2 hours ago', sentiment: 'bullish', link: 'https://www.theverge.com/netflix-password-sharing' },
+    { id: 'nflx2', title: 'Original Content Spending to Increase 15% in 2025', source: 'Variety', timestamp: '4 hours ago', sentiment: 'bullish', link: 'https://variety.com/netflix-content-spending' },
+    { id: 'nflx3', title: 'Competition from Disney+ Intensifies', source: 'WSJ', timestamp: '6 hours ago', sentiment: 'bearish', link: 'https://www.wsj.com/articles/netflix-disney-competition' },
   ],
 };
 
@@ -243,7 +286,7 @@ export default function NasdaqTop100() {
       <LeftPanel>
         <Header>
           <Title>NASDAQ Stocks</Title>
-          <Subtitle>Real-time market data</Subtitle>
+          <Subtitle>Top 10 NASDAQ stocks</Subtitle>
         </Header>
         <StockList>
           {mockStocks.map((stock) => (
@@ -265,7 +308,6 @@ export default function NasdaqTop100() {
                   </Change>
                 </StockPrice>
               </StockHeader>
-              <MiniChart />
             </StockCard>
           ))}
         </StockList>
@@ -273,37 +315,58 @@ export default function NasdaqTop100() {
 
       <RightPanel>
         <Header>
-          <Title>Live News Stream</Title>
-          <Subtitle>Market updates & insights</Subtitle>
+          <Title>Stock Chart & News</Title>
+          <Subtitle>
+            {selectedStock
+              ? `${selectedStock} - ${mockStocks.find(s => s.symbol === selectedStock)?.name}`
+              : 'Select a stock to view details'}
+          </Subtitle>
         </Header>
-        <NewsContainer>
-          {selectedStock ? (
-            <>
+        {selectedStock ? (
+          <>
+            <ChartContainer>
+              <ChartTitle>Price Chart</ChartTitle>
+              <div style={{ height: '400px', width: '100%' }}>
+                <TradingViewWidget symbol={selectedStock} theme="dark" />
+              </div>
+            </ChartContainer>
+            <NewsContainer>
               <NewsHeader>
-                <NewsTitle>{selectedStock} News</NewsTitle>
-                <NewsSubtitle>Latest updates for {mockStocks.find(s => s.symbol === selectedStock)?.name}</NewsSubtitle>
+                <NewsTitle>Latest News</NewsTitle>
+                <NewsSubtitle>Market updates & insights</NewsSubtitle>
               </NewsHeader>
-              {currentNews.map((news) => (
-                <NewsCard key={news.id}>
-                  <NewsCardHeader>
-                    <NewsItemTitle>{news.title}</NewsItemTitle>
-                    <SentimentBadge $sentiment={news.sentiment}>
-                      {news.sentiment === 'bullish' ? 'Bullish' : news.sentiment === 'bearish' ? 'Bearish' : 'Neutral'}
-                    </SentimentBadge>
-                  </NewsCardHeader>
-                  <NewsMetadata>
-                    <span>⏱ {news.timestamp}</span>
-                    <span>{news.source}</span>
-                  </NewsMetadata>
-                </NewsCard>
-              ))}
-            </>
-          ) : (
-            <EmptyState>
-              <p>주식을 선택하면 관련 뉴스가 표시됩니다</p>
-            </EmptyState>
-          )}
-        </NewsContainer>
+              {currentNews.length > 0 ? (
+                currentNews.map((news) => (
+                  <NewsCard
+                    key={news.id}
+                    href={news.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <NewsCardHeader>
+                      <NewsItemTitle>{news.title}</NewsItemTitle>
+                      <SentimentBadge $sentiment={news.sentiment}>
+                        {news.sentiment === 'bullish' ? 'Bullish' : news.sentiment === 'bearish' ? 'Bearish' : 'Neutral'}
+                      </SentimentBadge>
+                    </NewsCardHeader>
+                    <NewsMetadata>
+                      <span>⏱ {news.timestamp}</span>
+                      <span>📰 {news.source}</span>
+                    </NewsMetadata>
+                  </NewsCard>
+                ))
+              ) : (
+                <EmptyState>
+                  <p>No news available for {selectedStock}</p>
+                </EmptyState>
+              )}
+            </NewsContainer>
+          </>
+        ) : (
+          <EmptyState>
+            <p>주식을 선택하면 차트와 뉴스가 표시됩니다</p>
+          </EmptyState>
+        )}
       </RightPanel>
     </PageContainer>
   );

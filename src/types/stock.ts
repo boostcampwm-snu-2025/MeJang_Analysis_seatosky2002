@@ -12,4 +12,5 @@ export interface NewsItem {
   source: string;
   timestamp: string;
   sentiment: 'bullish' | 'bearish' | 'neutral';
+  link: string;
 }
