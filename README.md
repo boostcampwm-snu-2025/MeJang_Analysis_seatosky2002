@@ -33,6 +33,9 @@
 
 각 포트폴리오의 종목별 수익률, 시간대별 가치 변화를 그래프와 상세 데이터로 제공하여, 과거 특정 시점에 투자했다면 현재 어떤 성과를 냈을지 명확하게 확인할 수 있습니다.
 
+
+
+
 ## 주요 기능
 
 ### 📊 실시간 시장 데이터
@@ -60,6 +63,5 @@
 - **Backend**: FastAPI, Supabase
 - **Charts**: Recharts, TradingView Widget
 - **Authentication**: Supabase Auth
+https://github.com/user-attachments/assets/d4585699-90f6-4dde-8602-460edf3d8b89
 
-![alt text](image.png)
-![alt text](image-1.png)
