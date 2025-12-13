@@ -63,5 +63,6 @@
 - **Backend**: FastAPI, Supabase
 - **Charts**: Recharts, TradingView Widget
 - **Authentication**: Supabase Auth
+  
 https://github.com/user-attachments/assets/d4585699-90f6-4dde-8602-460edf3d8b89
 
